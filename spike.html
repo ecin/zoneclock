@@ -17,8 +17,10 @@
         position: absolute;
         width: 200px;
         height: 200px;
-        border: 1px solid #222;
+        background: white;
+        border: 2px solid #ccc;
         border-radius: 100%;
+        z-index: 3;
 
         top: calc(50% - 100px);
         left: calc(50% - 100px);
@@ -29,6 +31,7 @@
         height: 400px;
         top: calc(50% - 200px);
         left: calc(50% - 200px);
+        z-index: 2;
       }
 
       .zone + .zone + .zone {
@@ -36,11 +39,11 @@
         height: 600px;
         top: calc(50% - 300px);
         left: calc(50% - 300px);
+        z-index: 1;
       }
 
       .hour {
         position: absolute;
-        z-index: 1;
       }
 
       .night {
@@ -77,10 +80,37 @@
         this.zones = zones;
       }
 
-      var Zone = function(element, order) {
+      Clock.prototype.setTime = function(time) {
+        zones.forEach( function(zone) {
+          zone.setTime(time);
+        });
+      }
+
+      // Update zone positions every minute
+      Clock.prototype.start = function() {
+        this.zones.forEach( function(zone) {
+          setInterval( function() {
+            var now = new Date();
+            zone.setTime(now);
+          }, 1000 * 60);
+        });
+      }
+
+      Clock.prototype.stop = function() {
+        // store intervals in #start, clear them here.
+      }
+
+      var Zone = function(element, order, timezoneOffset) {
         this.element = element;
         this.order = order;
         this.hours = [];
+
+        var now = new Date();
+        this.setTimezoneOffset(timezoneOffset || now.getTimezoneOffset());
+
+        this.night = document.createElement("div");
+        this.night.setAttribute("class", "night");
+        this.element.appendChild(this.night);
 
         for (var hour = 0; hour < 24; hour++) {
           var hourElement = document.createElement("div");
@@ -91,20 +121,16 @@
           this.hours.push(hourElement);
         }
 
-        this.night = document.createElement("div");
-        this.night.setAttribute("class", "night");
-        this.element.appendChild(this.night);
-
-        this.update();
+        this.setTime(now);
       }
 
       // Update position of numerals on face
-      Zone.prototype.update = function(offset) {
-        offset = offset || this.offset();
-        var angle = Math.PI - offset;
+      Zone.prototype.setTime = function(time) {
+        offsetInRadians = this.getOffsetInRadians(time);
+        var angle = Math.PI - offsetInRadians;
         var length = this.hours.length;
 
-        //this.night.style.transform = "rotate(30deg)";
+        // TODO: add more vendor prefixes, or look for a polyfill.
         this.night.style.webkitTransform = "rotate(" + (angle + Math.PI) + "rad)";
         this.night.style.webkitTransformOrigin = "100% 50%";
 
@@ -117,17 +143,18 @@
         });
       }
 
-      Zone.prototype.setTimeZone = function(timeZone) {
-
+      // Timezone is number of minutes away from UTC,
+      // e.g. what you'd get from Date.getTimezoneOffset()
+      Zone.prototype.setTimezoneOffset = function(timezoneOffset) {
+        this.timezoneOffset = timezoneOffset;
       }
 
-      // use getTimezoneOffset() for this
-      // just need to
-      Zone.prototype.offset = function(timeZone) {
-        var now = new Date();
-        // mod by milliseconds in a day
+      // returns offset in radians
+      Zone.prototype.getOffsetInRadians = function(time) {
+        now = time || new Date();
         var minutesInADay = 24 * 60;
-        var offset = now.getHours() * 60 + now.getMinutes();
+        var minutesInAnHour = 60;
+        var offset = now.getUTCHours() * minutesInAnHour + now.getUTCMinutes() - this.timezoneOffset;
 
         return (2 * Math.PI * offset) / minutesInADay;
       }
@@ -144,7 +171,10 @@
       <div class="zone">
 
       </div>
-      <script>new Clock(document.getElementById("clock"));</script>
+      <script>
+        clock = new Clock(document.getElementById("clock"));
+        clock.start();
+      </script>
     </div>
   </body>
 </html>
