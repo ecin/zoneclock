@@ -104,6 +104,10 @@
         var angle = Math.PI - offset;
         var length = this.hours.length;
 
+        //this.night.style.transform = "rotate(30deg)";
+        this.night.style.webkitTransform = "rotate(" + (angle + Math.PI) + "rad)";
+        this.night.style.webkitTransformOrigin = "100% 50%";
+
         this.hours.forEach( function(hour) {
           hour.style.fontSize = (14 + 2 * this.order) + "px";
           var computedStyle = window.getComputedStyle(hour);
@@ -111,10 +115,6 @@
           hour.style.right = "calc(" + (50 + 40 * Math.sin(angle)) + "% - " + (parseInt(computedStyle["width"]) / 2) + "px)";
           angle += (2 * Math.PI) / length;
         });
-
-        //this.night.style.transform = "rotate(30deg)";
-        this.night.style.webkitTransform = "rotate(30deg)";
-        this.night.style.webkitTransformOrigin = "100% 50%";
       }
 
       Zone.prototype.setTimeZone = function(timeZone) {
