@@ -40,6 +40,29 @@
 
       .hour {
         position: absolute;
+        z-index: 1;
+      }
+
+      .night {
+        border-radius: 200px 0 0 200px;
+        position: absolute;
+        height: 200px;
+        width: 100px;
+        background: #eee;
+        opacity: 0.5;
+        z-index: 0;
+      }
+
+      .zone + .zone .night {
+        height: 400px;
+        width: 200px;
+        border-radius: 400px 0 0 400px;
+      }
+
+      .zone + .zone + .zone .night {
+        height: 600px;
+        width: 300px;
+        border-radius: 400px 0 0 400px;
       }
     </style>
     <script>
@@ -68,6 +91,10 @@
           this.hours.push(hourElement);
         }
 
+        this.night = document.createElement("div");
+        this.night.setAttribute("class", "night");
+        this.element.appendChild(this.night);
+
         this.update();
       }
 
@@ -84,13 +111,19 @@
           hour.style.right = "calc(" + (50 + 40 * Math.sin(angle)) + "% - " + (parseInt(computedStyle["width"]) / 2) + "px)";
           angle += (2 * Math.PI) / length;
         });
+
+        //this.night.style.transform = "rotate(30deg)";
+        this.night.style.webkitTransform = "rotate(30deg)";
+        this.night.style.webkitTransformOrigin = "100% 50%";
       }
 
       Zone.prototype.setTimeZone = function(timeZone) {
 
       }
 
-      Zone.prototype.offset = function() {
+      // use getTimezoneOffset() for this
+      // just need to
+      Zone.prototype.offset = function(timeZone) {
         var now = new Date();
         // mod by milliseconds in a day
         var minutesInADay = 24 * 60;
