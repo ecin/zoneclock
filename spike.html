@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>UTF-8 for clock</title>
+    <style>
+      html, body {
+        height: 100%;
+        width: 100%;
+      }
+
+      #clock {
+        position: relative;
+        top: 50%;
+      }
+
+      .zone {
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        border: 1px solid #222;
+        border-radius: 100%;
+
+        top: calc(50% - 100px);
+        left: calc(50% - 100px);
+      }
+
+      .zone + .zone {
+        width: 400px;
+        height: 400px;
+        top: calc(50% - 200px);
+        left: calc(50% - 200px);
+      }
+
+      .zone + .zone + .zone {
+        width: 600px;
+        height: 600px;
+        top: calc(50% - 300px);
+        left: calc(50% - 300px);
+      }
+
+      .hour {
+        position: absolute;
+      }
+    </style>
+    <script>
+      var Clock = function(element) {
+        var zones = element.getElementsByClassName("zone");
+
+        // Convert NodeList to Array
+        zones = Array.prototype.slice.call(zones);
+        zones = zones.map( function(element, index) { return new Zone(element, index); } );
+
+        this.element = element;
+        this.zones = zones;
+      }
+
+      var Zone = function(element, order) {
+        this.element = element;
+        this.order = order;
+        this.hours = [];
+
+        for (var hour = 0; hour < 24; hour++) {
+          var hourElement = document.createElement("div");
+          hourElement.innerHTML = hour;
+          hourElement.setAttribute("class", "hour");
+
+          this.element.appendChild(hourElement);
+          this.hours.push(hourElement);
+        }
+
+        this.update();
+      }
+
+      // Update position of numerals on face
+      Zone.prototype.update = function(offset) {
+        offset = offset || this.offset();
+        var angle = Math.PI - offset;
+        var length = this.hours.length;
+
+        this.hours.forEach( function(hour) {
+          hour.style.fontSize = (14 + 2 * this.order) + "px";
+          var computedStyle = window.getComputedStyle(hour);
+          hour.style.top = "calc(" + (50 + 40 * Math.cos(angle)) + "% - " + (parseInt(computedStyle["height"]) / 2) + "px)";
+          hour.style.right = "calc(" + (50 + 40 * Math.sin(angle)) + "% - " + (parseInt(computedStyle["width"]) / 2) + "px)";
+          angle += (2 * Math.PI) / length;
+        });
+      }
+
+      Zone.prototype.setTimeZone = function(timeZone) {
+
+      }
+
+      Zone.prototype.offset = function() {
+        var now = new Date();
+        // mod by milliseconds in a day
+        var minutesInADay = 24 * 60;
+        var offset = now.getHours() * 60 + now.getMinutes();
+
+        return (2 * Math.PI * offset) / minutesInADay;
+      }
+    </script>
+  </head>
+  <body>
+    <div id="clock">
+      <div class="zone">
+
+      </div>
+      <div class="zone">
+
+      </div>
+      <div class="zone">
+
+      </div>
+      <script>new Clock(document.getElementById("clock"));</script>
+    </div>
+  </body>
+</html>
