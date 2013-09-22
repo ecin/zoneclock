@@ -48,7 +48,7 @@
 
       .hour {
         position: absolute;
-        transition: all 0.5s;
+        transition: all 1s;
       }
 
       .night {
@@ -58,7 +58,7 @@
         width: 100px;
         background: #eee;
         opacity: 0.5;
-        transition: all 0.5s;
+        transition: all 1s;
       }
 
       .zone + .zone .night {
@@ -663,6 +663,9 @@
         // TODO: add more vendor prefixes, or look for a polyfill.
         this.night.style.webkitTransform = "rotate(" + (angle + Math.PI) + "rad)";
         this.night.style.webkitTransformOrigin = "100% 50%";
+
+        this.night.style.MozTransform = "rotate(" + (angle + Math.PI) + "rad)";
+        this.night.style.MozTransformOrigin = "100% 50%";
 
         this.hours.forEach( function(hour) {
           hour.style.fontSize = (14 + 2 * this.order) + "px";
