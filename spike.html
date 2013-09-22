@@ -8,6 +8,10 @@
         width: 100%;
       }
 
+      body {
+        overflow: hidden;
+      }
+
       #clock {
         position: relative;
         top: 50%;
@@ -75,6 +79,8 @@
         color: #777;
         font-weight: bold;
         position: relative;
+        width: 120px;
+        height: 15px;
       }
 
      .zone .country {
@@ -95,6 +101,13 @@
       .searchable {
         cursor: pointer;
         display: none;
+        position: relative;
+
+        font-size: 2.5em;
+        font-family: sans-serif;
+        color: #777;
+        font-weight: bold;
+        line-height: 1.2em;
       }
 
       .marker {
@@ -103,25 +116,27 @@
         border-left: 10px solid transparent;
         border-right: 10px solid transparent;
 
-        border-top: 10px solid #777;
+        border-top: 10px solid #ccc;
         border-radius: 100% 100% 0 0;
-        position: relative;
+        position: absolute;
+        top: -2px;
         display: inline;
       }
 
       .zone .marker {
-        top: -17px;
-        left: 94px;
+        left: 95px;
       }
 
       .zone + .zone .marker {
-        top: -17px;
         left: 195px;
       }
 
       .zone + .zone + .zone .marker {
         left: 295px;
-        top: -17px;
+      }
+
+      #current_time {
+        text-align: center;
       }
     </style>
     <script>
@@ -599,7 +614,7 @@
 
         this.searchables = document.createElement("div");
         this.searchables.setAttribute("class", "searchables" + this.order);
-        this.element.appendChild(this.searchables);
+        document.body.appendChild(this.searchables);
 
         for (var country in Timezones) {
           if (Timezones.hasOwnProperty(country)) {
