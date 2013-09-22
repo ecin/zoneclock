@@ -54,7 +54,6 @@
         width: 100px;
         background: #eee;
         opacity: 0.5;
-        z-index: 0;
         transition: all 0.5s;
       }
 
@@ -69,14 +68,492 @@
         width: 300px;
         border-radius: 400px 0 0 400px;
       }
+
+      .country {
+        border: 2px solid #ccc;
+        text-align: center;
+        color: #777;
+        font-weight: bold;
+        position: relative;
+      }
+
+     .zone .country {
+        top: 186px;
+        left: 36px;
+      }
+
+      .zone + .zone .country {
+        top: 381px;
+        left: 138px;
+      }
+
+      .zone + .zone + .zone .country {
+        top: 581px;
+        left: 237px;
+      }
+
+      .searchable {
+        cursor: pointer;
+        display: none;
+      }
+
+      .marker {
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+
+        border-top: 10px solid #777;
+        border-radius: 100% 100% 0 0;
+        position: relative;
+        display: inline;
+      }
+
+      .zone .marker {
+        top: -17px;
+        left: 94px;
+      }
+
+      .zone + .zone .marker {
+        top: -17px;
+        left: 195px;
+      }
+
+      .zone + .zone + .zone .marker {
+        left: 295px;
+        top: -17px;
+      }
     </style>
     <script>
+      var Timezones = {
+        "Abidjan": 0.0,
+        "Accra": 0.0,
+        "Addis Ababa": 3.0,
+        "Algiers": 1.0,
+        "Asmara": 3.0,
+        "Bamako": 0.0,
+        "Bangui": 1.0,
+        "Banjul": 0.0,
+        "Bissau": 0.0,
+        "Blantyre": 2.0,
+        "Brazzaville": 1.0,
+        "Bujumbura": 2.0,
+        "Cairo": 2.0,
+        "Casablanca": 0.0,
+        "Ceuta": 1.0,
+        "Conakry": 0.0,
+        "Dakar": 0.0,
+        "Dar es Salaam": 3.0,
+        "Djibouti": 3.0,
+        "Douala": 1.0,
+        "El Aaiun": 0.0,
+        "Freetown": 0.0,
+        "Gaborone": 2.0,
+        "Harare": 2.0,
+        "Johannesburg": 2.0,
+        "Juba": 3.0,
+        "Kampala": 3.0,
+        "Khartoum": 3.0,
+        "Kigali": 2.0,
+        "Kinshasa": 1.0,
+        "Lagos": 1.0,
+        "Libreville": 1.0,
+        "Lome": 0.0,
+        "Luanda": 1.0,
+        "Lubumbashi": 2.0,
+        "Lusaka": 2.0,
+        "Malabo": 1.0,
+        "Maputo": 2.0,
+        "Maseru": 2.0,
+        "Mbabane": 2.0,
+        "Mogadishu": 3.0,
+        "Monrovia": 0.0,
+        "Nairobi": 3.0,
+        "Ndjamena": 1.0,
+        "Niamey": 1.0,
+        "Nouakchott": 0.0,
+        "Ouagadougou": 0.0,
+        "Porto-Novo": 1.0,
+        "Sao Tome": 0.0,
+        "Tripoli": 1.0,
+        "Tunis": 1.0,
+        "Windhoek": 1.0,
+        "Adak": -10.0,
+        "Anchorage": -9.0,
+        "Anguilla": -4.0,
+        "Antigua": -4.0,
+        "Araguaina": -3.0,
+        "Buenos Aires": -3.0,
+        "Catamarca": -3.0,
+        "Cordoba": -3.0,
+        "Jujuy": -3.0,
+        "La Rioja": -3.0,
+        "Mendoza": -3.0,
+        "Rio Gallegos": -3.0,
+        "Salta": -3.0,
+        "San Juan": -3.0,
+        "San Luis": -4.0,
+        "Tucuman": -3.0,
+        "Ushuaia": -3.0,
+        "Aruba": -4.0,
+        "Asuncion": -4.0,
+        "Atikokan": -5.0,
+        "Bahia": -3.0,
+        "Bahia Banderas": -6.0,
+        "Barbados": -4.0,
+        "Belem": -3.0,
+        "Belize": -6.0,
+        "Blanc-Sablon": -4.0,
+        "Boa Vista": -4.0,
+        "Bogota": -5.0,
+        "Boise": -7.0,
+        "Cambridge Bay": -7.0,
+        "Campo Grande": -4.0,
+        "Cancun": -6.0,
+        "Caracas": -4.5,
+        "Cayenne": -3.0,
+        "Cayman": -5.0,
+        "Chicago": -6.0,
+        "Chihuahua": -7.0,
+        "Costa Rica": -6.0,
+        "Creston": -7.0,
+        "Cuiaba": -4.0,
+        "Curacao": -4.0,
+        "Danmarkshavn": 0.0,
+        "Dawson": -8.0,
+        "Dawson Creek": -7.0,
+        "Denver": -7.0,
+        "Detroit": -5.0,
+        "Dominica": -4.0,
+        "Edmonton": -7.0,
+        "Eirunepe": -4.0,
+        "El Salvador": -6.0,
+        "Fortaleza": -3.0,
+        "Glace Bay": -4.0,
+        "Godthab": -3.0,
+        "Goose Bay": -4.0,
+        "Grand Turk": -5.0,
+        "Grenada": -4.0,
+        "Guadeloupe": -4.0,
+        "Guatemala": -6.0,
+        "Guayaquil": -5.0,
+        "Guyana": -4.0,
+        "Halifax": -4.0,
+        "Havana": -5.0,
+        "Hermosillo": -7.0,
+        "Indianapolis": -5.0,
+        "Knox": -6.0,
+        "Marengo": -5.0,
+        "Petersburg": -5.0,
+        "Tell City": -6.0,
+        "Vevay": -5.0,
+        "Vincennes": -5.0,
+        "Winamac": -5.0,
+        "Inuvik": -7.0,
+        "Iqaluit": -5.0,
+        "Jamaica": -5.0,
+        "Juneau": -9.0,
+        "Louisville": -5.0,
+        "Monticello": -5.0,
+        "Kralendijk": -4.0,
+        "La Paz": -4.0,
+        "Lima": -5.0,
+        "Los Angeles": -8.0,
+        "Lower Princes": -4.0,
+        "Maceio": -3.0,
+        "Managua": -6.0,
+        "Manaus": -4.0,
+        "Marigot": -4.0,
+        "Martinique": -4.0,
+        "Matamoros": -6.0,
+        "Mazatlan": -7.0,
+        "Menominee": -6.0,
+        "Merida": -6.0,
+        "Metlakatla": -8.0,
+        "Mexico City": -6.0,
+        "Miquelon": -3.0,
+        "Moncton": -4.0,
+        "Monterrey": -6.0,
+        "Montevideo": -3.0,
+        "Montreal": -5.0,
+        "Montserrat": -4.0,
+        "Nassau": -5.0,
+        "New York": -5.0,
+        "Nipigon": -5.0,
+        "Nome": -9.0,
+        "Noronha": -2.0,
+        "Beulah": -6.0,
+        "Center": -6.0,
+        "New Salem": -6.0,
+        "Ojinaga": -7.0,
+        "Panama": -5.0,
+        "Pangnirtung": -5.0,
+        "Paramaribo": -3.0,
+        "Phoenix": -7.0,
+        "Port-au-Prince": -5.0,
+        "Port of Spain": -4.0,
+        "Porto Velho": -4.0,
+        "Puerto Rico": -4.0,
+        "Rainy River": -6.0,
+        "Rankin Inlet": -6.0,
+        "Recife": -3.0,
+        "Regina": -6.0,
+        "Resolute": -6.0,
+        "Rio Branco": -4.0,
+        "Santa Isabel": -8.0,
+        "Santarem": -3.0,
+        "Santiago": -4.0,
+        "Santo Domingo": -4.0,
+        "Sao Paulo": -3.0,
+        "Scoresbysund": -1.0,
+        "Shiprock": -7.0,
+        "Sitka": -9.0,
+        "St Barthelemy": -4.0,
+        "St Johns": -3.5,
+        "St Kitts": -4.0,
+        "St Lucia": -4.0,
+        "St Thomas": -4.0,
+        "St Vincent": -4.0,
+        "Swift Current": -6.0,
+        "Tegucigalpa": -6.0,
+        "Thule": -4.0,
+        "Thunder Bay": -5.0,
+        "Tijuana": -8.0,
+        "Toronto": -5.0,
+        "Tortola": -4.0,
+        "Vancouver": -8.0,
+        "Whitehorse": -8.0,
+        "Winnipeg": -6.0,
+        "Yakutat": -9.0,
+        "Yellowknife": -7.0,
+        "Casey": 8.0,
+        "Davis": 7.0,
+        "DumontDUrville": 10.0,
+        "Macquarie": 11.0,
+        "Mawson": 5.0,
+        "McMurdo": 12.0,
+        "Palmer": -4.0,
+        "Rothera": -3.0,
+        "South Pole": 12.0,
+        "Syowa": 3.0,
+        "Vostok": 6.0,
+        "Longyearbyen": 1.0,
+        "Aden": 3.0,
+        "Almaty": 6.0,
+        "Amman": 2.0,
+        "Anadyr": 12.0,
+        "Aqtau": 5.0,
+        "Aqtobe": 5.0,
+        "Ashgabat": 5.0,
+        "Baghdad": 3.0,
+        "Bahrain": 3.0,
+        "Baku": 4.0,
+        "Bangkok": 7.0,
+        "Beirut": 2.0,
+        "Bishkek": 6.0,
+        "Brunei": 8.0,
+        "Choibalsan": 8.0,
+        "Chongqing": 8.0,
+        "Colombo": 5.5,
+        "Damascus": 2.0,
+        "Dhaka": 6.0,
+        "Dili": 9.0,
+        "Dubai": 4.0,
+        "Dushanbe": 5.0,
+        "Gaza": 2.0,
+        "Harbin": 8.0,
+        "Hebron": 2.0,
+        "Ho Chi Minh": 7.0,
+        "Hong Kong": 8.0,
+        "Hovd": 7.0,
+        "Irkutsk": 9.0,
+        "Jakarta": 7.0,
+        "Jayapura": 9.0,
+        "Jerusalem": 2.0,
+        "Kabul": 4.5,
+        "Kamchatka": 12.0,
+        "Karachi": 5.0,
+        "Kashgar": 8.0,
+        "Kathmandu": 5.75,
+        "Khandyga": 10.0,
+        "Kolkata": 5.5,
+        "Krasnoyarsk": 8.0,
+        "Kuala Lumpur": 8.0,
+        "Kuching": 8.0,
+        "Kuwait": 3.0,
+        "Macau": 8.0,
+        "Magadan": 12.0,
+        "Makassar": 8.0,
+        "Manila": 8.0,
+        "Muscat": 4.0,
+        "Nicosia": 2.0,
+        "Novokuznetsk": 7.0,
+        "Novosibirsk": 7.0,
+        "Omsk": 7.0,
+        "Oral": 5.0,
+        "Phnom Penh": 7.0,
+        "Pontianak": 7.0,
+        "Pyongyang": 9.0,
+        "Qatar": 3.0,
+        "Qyzylorda": 6.0,
+        "Rangoon": 6.5,
+        "Riyadh": 3.0,
+        "Sakhalin": 11.0,
+        "Samarkand": 5.0,
+        "Seoul": 9.0,
+        "Shanghai": 8.0,
+        "Singapore": 8.0,
+        "Taipei": 8.0,
+        "Tashkent": 5.0,
+        "Tbilisi": 4.0,
+        "Tehran": 3.5,
+        "Thimphu": 6.0,
+        "Tokyo": 9.0,
+        "Ulaanbaatar": 8.0,
+        "Urumqi": 8.0,
+        "Ust-Nera": 11.0,
+        "Vientiane": 7.0,
+        "Vladivostok": 11.0,
+        "Yakutsk": 10.0,
+        "Yekaterinburg": 6.0,
+        "Yerevan": 4.0,
+        "Azores": -1.0,
+        "Bermuda": -4.0,
+        "Canary": 0.0,
+        "Cape Verde": -1.0,
+        "Faroe": 0.0,
+        "Madeira": 0.0,
+        "Reykjavik": 0.0,
+        "South Georgia": -2.0,
+        "St Helena": 0.0,
+        "Stanley": -3.0,
+        "Adelaide": 9.5,
+        "Brisbane": 10.0,
+        "Broken Hill": 9.5,
+        "Currie": 10.0,
+        "Darwin": 9.5,
+        "Eucla": 8.75,
+        "Hobart": 10.0,
+        "Lindeman": 10.0,
+        "Lord Howe": 10.5,
+        "Melbourne": 10.0,
+        "Perth": 8.0,
+        "Sydney": 10.0,
+        "Amsterdam": 1.0,
+        "Andorra": 1.0,
+        "Athens": 2.0,
+        "Belgrade": 1.0,
+        "Berlin": 1.0,
+        "Bratislava": 1.0,
+        "Brussels": 1.0,
+        "Bucharest": 2.0,
+        "Budapest": 1.0,
+        "Busingen": 1.0,
+        "Chisinau": 2.0,
+        "Copenhagen": 1.0,
+        "Dublin": 0.0,
+        "Gibraltar": 1.0,
+        "Guernsey": 0.0,
+        "Helsinki": 2.0,
+        "Isle of Man": 0.0,
+        "Istanbul": 2.0,
+        "Jersey": 0.0,
+        "Kaliningrad": 3.0,
+        "Kiev": 2.0,
+        "Lisbon": 0.0,
+        "Ljubljana": 1.0,
+        "London": 0.0,
+        "Luxembourg": 1.0,
+        "Madrid": 1.0,
+        "Malta": 1.0,
+        "Mariehamn": 2.0,
+        "Minsk": 3.0,
+        "Monaco": 1.0,
+        "Moscow": 4.0,
+        "Oslo": 1.0,
+        "Paris": 1.0,
+        "Podgorica": 1.0,
+        "Prague": 1.0,
+        "Riga": 2.0,
+        "Rome": 1.0,
+        "Samara": 4.0,
+        "San Marino": 1.0,
+        "Sarajevo": 1.0,
+        "Simferopol": 2.0,
+        "Skopje": 1.0,
+        "Sofia": 2.0,
+        "Stockholm": 1.0,
+        "Tallinn": 2.0,
+        "Tirane": 1.0,
+        "Uzhgorod": 2.0,
+        "Vaduz": 1.0,
+        "Vatican": 1.0,
+        "Vienna": 1.0,
+        "Vilnius": 2.0,
+        "Volgograd": 4.0,
+        "Warsaw": 1.0,
+        "Zagreb": 1.0,
+        "Zaporozhye": 2.0,
+        "Zurich": 1.0,
+        "Antananarivo": 3.0,
+        "Chagos": 6.0,
+        "Christmas": 7.0,
+        "Cocos": 6.5,
+        "Comoro": 3.0,
+        "Kerguelen": 5.0,
+        "Mahe": 4.0,
+        "Maldives": 5.0,
+        "Mauritius": 4.0,
+        "Mayotte": 3.0,
+        "Reunion": 4.0,
+        "Apia": 13.0,
+        "Auckland": 12.0,
+        "Chatham": 12.75,
+        "Chuuk": 10.0,
+        "Easter": -6.0,
+        "Efate": 11.0,
+        "Enderbury": 13.0,
+        "Fakaofo": 13.0,
+        "Fiji": 12.0,
+        "Funafuti": 12.0,
+        "Galapagos": -6.0,
+        "Gambier": -9.0,
+        "Guadalcanal": 11.0,
+        "Guam": 10.0,
+        "Honolulu": -10.0,
+        "Johnston": -10.0,
+        "Kiritimati": 14.0,
+        "Kosrae": 11.0,
+        "Kwajalein": 12.0,
+        "Majuro": 12.0,
+        "Marquesas": -9.5,
+        "Midway": -11.0,
+        "Nauru": 12.0,
+        "Niue": -11.0,
+        "Norfolk": 11.5,
+        "Noumea": 11.0,
+        "Pago Pago": -11.0,
+        "Palau": 9.0,
+        "Pitcairn": -8.0,
+        "Pohnpei": 11.0,
+        "Port Moresby": 10.0,
+        "Rarotonga": -10.0,
+        "Saipan": 10.0,
+        "Tahiti": -10.0,
+        "Tarawa": 12.0,
+        "Tongatapu": 13.0,
+        "Wake": 12.0,
+        "Wallis": 12.0,
+      }
+
       var Clock = function(element) {
         var zones = element.getElementsByClassName("zone");
 
         // Convert NodeList to Array
         zones = Array.prototype.slice.call(zones);
-        zones = zones.map( function(element, index) { return new Zone(element, index); } );
+        zones = zones.map(function(element, index) {
+          return new Zone(element, index);
+        });
 
         this.element = element;
         this.zones = zones;
@@ -103,6 +580,8 @@
       }
 
       var Zone = function(element, order, timezoneOffset) {
+        var self = this;
+
         this.element = element;
         this.order = order;
         this.hours = [];
@@ -114,6 +593,36 @@
         this.night.setAttribute("class", "night");
         this.element.appendChild(this.night);
 
+        this.country = document.createElement("input");
+        this.country.setAttribute("class", "country search");
+        this.element.appendChild(this.country);
+
+        this.searchables = document.createElement("div");
+        this.searchables.setAttribute("class", "searchables" + this.order);
+        this.element.appendChild(this.searchables);
+
+        for (var country in Timezones) {
+          if (Timezones.hasOwnProperty(country)) {
+            var offset = Timezones[country];
+
+            var searchable = document.createElement("div");
+            searchable.setAttribute("class", "searchable");
+            searchable.setAttribute("data-index", country.toLowerCase());
+            searchable.innerHTML = country;
+            self.searchables.appendChild(searchable);
+
+            searchable.addEventListener("click", function(value) {
+              return function() {
+                var country = value;
+                self.country.value = country;
+                document.getElementById("search_style").innerHTML = "";
+                self.setTimezoneOffset(Timezones[country] * -60);
+                self.setTime();
+              }
+            }(country));
+          }
+        };
+
         for (var hour = 0; hour < 24; hour++) {
           var hourElement = document.createElement("div");
           hourElement.innerHTML = hour;
@@ -122,6 +631,10 @@
           this.element.appendChild(hourElement);
           this.hours.push(hourElement);
         }
+
+        this.marker = document.createElement("div");
+        this.marker.setAttribute("class", "marker");
+        this.element.appendChild(this.marker);
 
         this.setTime(now);
       }
@@ -161,22 +674,37 @@
         return (2 * Math.PI * offset) / minutesInADay;
       }
     </script>
-  </head>
+    <style id="search_style"></style>
+ </head>
   <body>
     <div id="clock">
       <div class="zone">
-
       </div>
       <div class="zone">
-
       </div>
       <div class="zone">
-
       </div>
       <script>
         clock = new Clock(document.getElementById("clock"));
         clock.start();
       </script>
+    <script type="text/javascript">
+      var searchStyle = document.getElementById("search_style");
+      var searchInputs = document.getElementsByClassName("search");
+      searchInputs = Array.prototype.slice.call(searchInputs);
+
+      searchInputs.forEach(function(searchInput, index) {
+        searchInput.addEventListener("input", function() {
+          if (!this.value) {
+            searchStyle.innerHTML = "";
+          } else {
+            searchStyle.innerHTML = ".searchables" + index + " .searchable { display: block; }\n" +
+              ".searchables" + index + " .searchable:not([data-index*=\"" + this.value.toLowerCase() + "\"]) { display: none; }";
+          }
+        });
+      });
+    </script>
+
     </div>
   </body>
 </html>
